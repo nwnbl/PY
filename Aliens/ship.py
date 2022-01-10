@@ -8,7 +8,7 @@ class Ship:
         self.image = pygame.image.load('D:\VSCODECNM\PY\Aliens\ship1.bmp')
         self.rect = self.image.get_rect()
 
-        self.rect.midbottom = self.screen_rect.midbottom
+        self.rect.midbottom = (600,800)
     
     def blitme(self):
         self.screen.blit(self.image,self.rect)
