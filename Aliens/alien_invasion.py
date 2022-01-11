@@ -2,6 +2,7 @@ import sys
 import pygame
 from settings import *
 from ship import Ship
+from bullet import Bullet
 
 class AlienInvasion:
     """游戏资源管理+行为管理"""
@@ -14,6 +15,7 @@ class AlienInvasion:
         pygame.display.set_caption("Alien Invasion")
         self.bg_color=self.settings.bg_color
         self.ship=Ship(self)
+        self.bullets = pygame.sprite.Group()
     
     def run_game(self):
         """主循环"""
@@ -21,6 +23,7 @@ class AlienInvasion:
             self._check_events()
             self.ship.update()
             self._update_screen()
+            self.bullets.update()
     
     def _check_events(self):
         # 键盘鼠标事件监视
@@ -29,22 +32,39 @@ class AlienInvasion:
                 sys.exit()
 
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    self.ship.moving_right = True
-                elif event.key == pygame.K_LEFT:
-                    self.ship.moving_left = True
+                self._check_keydown_event(event)
             
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_RIGHT:
-                    self.ship.moving_right = False
-                elif event.key == pygame.K_LEFT:
-                    self.ship.moving_left = False
+                self._check_keyup_event(event)
+            
     
     def _update_screen(self):
         # 让最近绘制的屏幕可见
         pygame.display.flip()
         self.screen.fill(self.bg_color)
         self.ship.blitme()
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
+    def _check_keydown_event(self, event):
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = True
+        elif event.key == pygame.K_q:
+            sys.exit()
+        elif event.key == pygame.K_SPACE:
+            self._fire_bullet()
+    
+    def _check_keyup_event(self, event):
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = False
+
+    def _fire_bullet(self):
+        new_bullet = Bullet(self)
+        self.bullets.add(new_bullet)
     
         
 
