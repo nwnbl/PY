@@ -4,6 +4,8 @@ from settings import *
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+from time import sleep
+from game_stats import GameStats
 
 class AlienInvasion:
     """游戏资源管理+行为管理"""
@@ -15,6 +17,7 @@ class AlienInvasion:
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Alien Invasion")
         self.bg_color=self.settings.bg_color
+        self.stats = GameStats(self)
         self.ship=Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
@@ -26,11 +29,13 @@ class AlienInvasion:
         """主循环"""
         while True:
             self._check_events()
-            self.ship.update()
-            self._update_screen()
-            self._update_bullets()
-            self.bullets.update()
+
+            if self.stats.game_active == True:
+                self.ship.update()
+                self._update_bullets()
+                self._update_aliens()
             
+            self._update_screen()
             # print(len(self.bullets))
     
     #############
@@ -112,9 +117,57 @@ class AlienInvasion:
         alien.rect.x = alien.x
         alien.rect.y = alien.y
         self.aliens.add(alien)
+    
+    ############
+    """在此处进行对碰撞判断和处理函数的调用"""
+    def _update_aliens(self):
+        self._check_fleet_edges()
+        self.aliens.update()
+        collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+        self._check_alien_bottom()
 
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            #print("Ship hit!!!")
+            self._ship_hit()
+
+    #############
+    def _check_fleet_edges(self):
+        for alien in self.aliens.sprites():
+            if alien.check_edges():
+                self._change_fleet_direction()
+                break
+    
+    ############
+    def _change_fleet_direction(self):
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1
+
+    ###########
+    def _ship_hit(self):
+        if self.stats.ships_left > 0:
+            self.stats.ships_left -= 1
+            self.aliens.empty()
+            self.bullets.empty()
+
+            self._create_fleet()
+            self.ship.center_ship()
+
+            sleep(0.5)
+        else:
+            self.stats.game_active = False
+    
+    ############
+    def _check_alien_bottom(self):
+        screen_rect = self.screen.get_rect()
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= screen_rect.bottom:
+                self._ship_hit()
+                break
+
+    
         
-
+########################################################
 if __name__ == "__main__":
     # 创建游戏实例
     ai = AlienInvasion()

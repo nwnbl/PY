@@ -9,7 +9,7 @@ class Ship:
         self.image = pygame.image.load('D:\VSCODECNM\PY\Aliens\ship1.bmp')
         self.rect = self.image.get_rect()
 
-        self.rect.midbottom = (800,900)
+        self.rect.midbottom = (800, 900)
         self.x = float(self.rect.x)
 
         self.moving_right = False
@@ -23,4 +23,8 @@ class Ship:
             self.rect.x += self.settings.ship_speed
         elif self.moving_left == True and self.rect.left > 0:
             self.rect.x -= self.settings.ship_speed
+        self.x = self.rect.x
+    
+    def center_ship(self):
+        self.rect.midbottom = (800, 900)
         self.x = self.rect.x
