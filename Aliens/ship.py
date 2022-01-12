@@ -1,12 +1,15 @@
 import pygame
+from pygame import sprite
+from pygame.sprite import Sprite
 
-class Ship:
+class Ship(Sprite):
     def __init__(self, ai_game):
+        super().__init__()
         self.screen = ai_game.screen
         self.screen_rect = ai_game.screen.get_rect()
         self.settings = ai_game.settings
 
-        self.image = pygame.image.load('D:\VSCODECNM\PY\Aliens\ship1.bmp')
+        self.image = pygame.image.load('D:\VSCODECNM\PY\Aliens\ship_small.bmp')
         self.rect = self.image.get_rect()
 
         self.rect.midbottom = (800, 900)
